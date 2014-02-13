@@ -1,0 +1,145 @@
+#!/bin/bash
+
+##---------------------------------------------------------------------------##
+# Author: Thomas Hackl
+# Version: 0.01
+#
+# Initialize a project directory layout with default structure
+
+##---------------------------------------------------------------------------##
+# TODO: -s|--super-project - create a link
+# TODO: -c|--code-project - code project folder structure (bin/ lib/ ...) in /code/<code-project>
+# TODO: -d|--description - PROJECT.txt
+
+##---------------------------------------------------------------------------##
+
+SCRIPT=`basename $0`;
+
+function show_usage {
+echo "Usage: $SCRIPT <project name>" 2>&1;
+}
+
+function show_help {
+
+	show_usage
+	
+	cat <<HELP
+
+TODO
+
+HELP
+
+}
+
+function fatal {
+	echo $1 1>&2;
+	exit 1;
+}
+
+# Opts/Args
+
+# Execute getopt
+ARGS=`getopt --name "SCRIPT" \
+    --options "s:c:d:hV" \
+    --longoptions "super-project:,code-project:,description:,help,version" \
+    -- "$@"`
+
+#Bad arguments
+[ $? -ne 0 ] && exit 1;
+
+# A little magic
+eval set -- "$ARGS"
+
+# Now go through all the options
+while true; do
+    case "$1" in
+        -s|--super-project)
+            [ ! -n "$2" ] && (echo "$1: value required" 1>&2 && exit 1);
+            SUPER=$2
+            shift 2;;
+            	     
+        -c|--code-projects)
+            [ ! -n "$2" ] && (echo "$1: value required" 1>&2 && exit 1);
+            CODE=$2
+            shift 2;;
+        -d|--description)
+            [ ! -n "$2" ] && (echo "$1: value required" 1>&2 && exit 1);
+            DESC=$2
+            shift 2;;
+	
+	-h|--help)
+	       show_help && exit 0;;
+
+        -V|--version)
+           grep -m1 'Version' "$0" | sed 's/.*Version\s*//';
+           exit 0;;
+	       	       	       
+        --)
+            shift
+            break;;
+        *)
+            echo "$1: Unknown option" 1>&2 && exit 1;;
+  esac
+done
+
+# process some args and opts
+if [ $# -eq 0 ]; then
+	echo "Project name required" 2>&1;
+	show_usage;
+	exit 1;
+fi;
+
+
+
+##---------------------------------------------------------------------------##
+
+PROJECT_ID=$1;
+
+declare -a SUBDIRS=( analysis code data docs etc subprojects );
+
+
+for subdir in "${SUBDIRS[@]}"; do
+	mkdir -p "$PROJECT_ID/$subdir"; 
+done;
+
+echo "Created subdirectories";
+
+if [ -n "$SUPER" ]; then
+
+	# store cwd
+	WD=`pwd`; 
+
+	# goto super
+	cd $SUPER || fatal "cannot find --super-project $SUPER";
+	if [ ! -d "subprojects" ]; then
+		mkdir subprojects || fatal "cannot create $SUPER/subprojects";
+	fi;
+	cd subprojects;
+
+	# create link
+	ln -s "$WD/$PROJECT_ID" || fatal "could not creat subproject link"; 
+	
+	# go home
+	cd "$WD" 
+
+	# create a link to super
+	mkdir super;
+	cd super;
+	ln -s "$SUPER";
+	cd ..;
+
+	echo "Linked from --super-project $SUPER";
+fi;
+
+if [ -n "$CODE" ]; then
+	echo "Created --code-project $CODE";
+
+fi;
+
+if [ -n "$DESC" ]; then
+	echo "feature not yet implemented" 1>&2;
+	exit 1;
+#	echo "Creating --description";
+
+fi;
+
