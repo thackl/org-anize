@@ -111,6 +111,7 @@ if [ -n "$SUPER" ]; then
 
 	# goto super
 	cd $SUPER || fatal "cannot find --super-project $SUPER";
+	SWD=`pwd`;
 	if [ ! -d "subprojects" ]; then
 		mkdir subprojects || fatal "cannot create $SUPER/subprojects";
 	fi;
@@ -119,14 +120,16 @@ if [ -n "$SUPER" ]; then
 	# create link
 	ln -s "$WD/$PROJECT_ID" || fatal "could not creat subproject link"; 
 	
-	# go home
-	cd "$WD" 
+	# goto project
+	cd "$WD/$PROJECT_ID"; 
 
 	# create a link to super
 	mkdir super;
 	cd super;
-	ln -s "$SUPER";
-	cd ..;
+	ln -s "$SWD";
+	
+	# go back to wd
+	cd $WD;
 
 	echo "Linked from --super-project $SUPER";
 fi;
