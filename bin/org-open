@@ -1,0 +1,16 @@
+#!/bin/bash
+
+HIT=${1:-"PhD-project"};
+DIR=${2:-"/home/thackl/PhD/projects/*/org"};
+
+org-open(){
+    FILES=`find $DIR -iname "*"$HIT"*.org"`;
+    if [ -n "$FILES" ]; then
+	echo "running: emacs" $FILES 2>&1;
+	emacs $FILES & 
+    else
+	echo "No org file matching "$1" found" 1>&2
+    fi;
+}
+
+org-open $HIT;
