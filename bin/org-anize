@@ -1,0 +1,98 @@
+#!/bin/bash
+
+CMD=${1:-"help"}
+PRO=$2;
+DIR=${3:-"/home/thackl/PhD/projects/*/org"};
+
+
+EDITOR=emacs;
+FILEMANAGER=nautilus;
+
+##----------------------------------------------------------------------------##
+# find
+org-find(){
+    ORGS=`find $DIR -iname "*"$PRO"*.org" -a ! -name ".*"`;
+    PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
+    
+    if [ -n "$PROS" ]; then
+	echo "matching:"
+	for pro in ${PROS[@]}; do 
+	    printf "   %-20s %s\n" `basename $pro` $pro; 
+	done;
+    else
+	echo "No org file matching "$PRO" found" 1>&2
+    fi;
+}
+
+
+
+
+##----------------------------------------------------------------------------##
+# edit
+org-edit(){
+
+    org-find;
+
+    if [ 0 -lt ${#PROS[@]} ]; then
+	if [ 3 -lt ${#PROS[@]} ]; then
+	    echo "Are you sure you want to open this many projects at once"
+	else
+	    echo "editing:" 
+	    for org in $ORGS; do echo "   $org"; done;
+	    $EDITOR $ORGS & 
+	fi;
+    fi;
+}
+
+
+
+
+##----------------------------------------------------------------------------##
+# open
+org-open(){
+
+    org-find;
+    
+    if [ 0 -lt ${#PROS[@]} ]; then
+	if [ 3 -lt ${#PROS[@]} ]; then
+	    echo "Are you sure you want to open this many projects at once"
+	else
+	    echo "opening:"
+	    for pro in $PROS; do
+		echo "   $pro";
+		$FILEMANAGER "$pro";
+	    done;  
+	fi;
+    fi;
+}
+
+
+
+
+##----------------------------------------------------------------------------##
+# init
+org-init(){
+    org-init-project $@;
+}
+
+
+
+
+##----------------------------------------------------------------------------##
+org-help(){
+    echo 'Usage: org-anize <CMD> [<PROJECT/PATTERN>] [<SEARCHPATH>]
+  
+  find    Find and list available projects
+  init    Initialize new project with default directory structure at PROJECT
+  edit    Edit the master *.org file of PROJECT/PATTERN
+  open    Open PROJECT/PATTERN root folder
+
+'
+}
+
+
+
+
+
+##----------------------------------------------------------------------------##
+org-$CMD;
