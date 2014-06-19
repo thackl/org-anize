@@ -2,8 +2,10 @@
 
 CMD=${1:-"help"}
 PRO=$2;
-DIR=${3:-"/home/thackl/PhD/projects/*/org"};
+DIR="/home/thackl/PhD/projects/*/org";
 
+shift; 
+shift;
 
 EDITOR=emacs;
 FILEMANAGER=nautilus;
@@ -31,15 +33,23 @@ org-find(){
 # edit
 org-edit(){
 
+    TARGET=$1; # by default, open *-project-org file
+
     org-find;
 
     if [ 0 -lt ${#PROS[@]} ]; then
 	if [ 3 -lt ${#PROS[@]} ]; then
 	    echo "Are you sure you want to open this many projects at once"
 	else
-	    echo "editing:" 
-	    for org in $ORGS; do echo "   $org"; done;
-	    $EDITOR $ORGS & 
+	    if [ -z $TARGET ]; then
+		echo "editing *-project.org" 
+		for org in $ORGS; do echo "   $org"; done;
+		$EDITOR $ORGS & 
+	    else
+		echo "editing directory $TARGET" 
+		for pro in $PROS; do echo "   $pro/$TARGET"; done;
+		$EDITOR $pro/$TARGET & 
+	    fi; 
 	fi;
     fi;
 }
@@ -95,4 +105,4 @@ org-help(){
 
 
 ##----------------------------------------------------------------------------##
-org-$CMD;
+org-$CMD $@;
