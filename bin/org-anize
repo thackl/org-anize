@@ -77,6 +77,24 @@ org-open(){
 }
 
 
+##----------------------------------------------------------------------------##
+# change-dir
+org-dir(){
+
+    org-find;
+    
+    if [ 0 -lt ${#PROS[@]} ]; then
+	if [ 1 -lt ${#PROS[@]} ]; then
+	    echo "Matching multiple projects" 1>&2; exit;
+	else
+	    for pro in $PROS; do
+		echo $pro;
+	    done;  
+	fi;
+    fi;
+}
+
+
 
 
 ##----------------------------------------------------------------------------##
