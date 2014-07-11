@@ -17,9 +17,9 @@ org-find(){
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
     
     if [ -n "$PROS" ]; then
-	echo "matching:"
+	echo "matching:" 1>&2;
 	for pro in ${PROS[@]}; do 
-	    printf "   %-20s %s\n" `basename $pro` $pro; 
+	    printf "   %-20s %s\n" `basename $pro` $pro 1>&2; 
 	done;
     else
 	echo "No org file matching "$PRO" found" 1>&2
