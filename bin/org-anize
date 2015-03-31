@@ -2,7 +2,7 @@
 
 CMD=${1:-"help"}
 PRO=$2;
-DIR="/home/thackl/PhD/projects/*/org";
+DIR="/home/thackl/P*/projects/*/org";
 
 shift; 
 shift;
@@ -13,7 +13,7 @@ FILEMANAGER=nautilus;
 ##----------------------------------------------------------------------------##
 # find
 org-find(){
-    ORGS=`find $DIR -iname "*"$PRO"*.org" -a ! -name ".*"`;
+    ORGS=`find $DIR -iname "*"$PRO"*.org" -a ! -name ".*" | xargs -n1 readlink -f | sort | uniq`;
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
     
     if [ -n "$PROS" ]; then
