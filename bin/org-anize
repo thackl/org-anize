@@ -1,19 +1,26 @@
 #!/bin/bash
 
+# Author: Thomas Hackl - thackl@lim4.de
+
+# find script dir
+[ -h $0 ] && SCRIPT=$(readlink "$0") || SCRIPT="$0";
+SCRIPT_DIR=$(dirname $SCRIPT);
+
+# read config
+if [ -f $SCRIPT_DIR/org-anize-rc ]; then
+    . $SCRIPT_DIR/org-anize-rc
+fi
+
 CMD=${1:-"help"}
 PRO=$2;
-DIR="/home/thackl/P*/projects/*/org";
 
 shift; 
 shift;
 
-EDITOR=emacs;
-FILEMANAGER=nautilus;
-
 ##----------------------------------------------------------------------------##
 # find
 org-find(){
-    ORGS=`find $DIR -iname "*"$PRO"*.org" -a ! -name ".*" | xargs -n1 readlink -f | sort | uniq`;
+    ORGS=`find ${ORG_PATH//:/ } -iname "*"$PRO"*-project.org" -a ! -name ".*" | xargs -n1 readlink -f | sort | uniq`;
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
     
     if [ -n "$PROS" ]; then
@@ -44,11 +51,11 @@ org-edit(){
 	    if [ -z $TARGET ]; then
 		echo "editing *-project.org" 
 		for org in $ORGS; do echo "   $org"; done;
-		$EDITOR $ORGS & 
+		$ORG_EDITOR $ORGS & 
 	    else
 		echo "editing directory $TARGET" 
 		for pro in $PROS; do echo "   $pro/$TARGET"; done;
-		$EDITOR $pro/$TARGET & 
+		$ORG_EDITOR $pro/$TARGET & 
 	    fi; 
 	fi;
     fi;
@@ -70,7 +77,7 @@ org-open(){
 	    echo "opening:"
 	    for pro in $PROS; do
 		echo "   $pro";
-		$FILEMANAGER "$pro";
+		$ORG_FILEMANAGER "$pro";
 	    done;  
 	fi;
     fi;
@@ -117,9 +124,6 @@ org-help(){
 
 '
 }
-
-
-
 
 
 ##----------------------------------------------------------------------------##

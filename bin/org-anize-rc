@@ -1,0 +1,19 @@
+#!/bin/bash
+ORG_PATH="/home/thackl/projects/*/org:/home/thackl/projects/*/*/org"
+ORG_EDITOR=emacs
+ORG_FILEMANAGER=nautilus
+
+ORG_PRJ_SUF="-project.org"
+ORG_PRJ_DIRS="org:docs:code:etc"
+
+ORG_PRJ_AUTHOR="Thomas Hackl"
+ORG_PRJ_TPL=$(cat <<'EOF'
+# -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
+#+TITLE: Project ${PRJ_ID}
+#+AUTHOR: ${ORG_PRJ_AUTHOR}
+#+DATE: ${PRJ_DATE}
+
+* Meta
+* Research Log
+EOF
+           )
