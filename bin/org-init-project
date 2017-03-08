@@ -4,9 +4,6 @@
 
 # Initialize a project directory layout with default structure
 
-# TODO: -c|--code-project - code project folder structure (bin/ lib/ ...) in /code/<code-project>
-# TODO: -d|--description - PROJECT.txt
-
 ##---------------------------------------------------------------------------##
 
 # find script dir
@@ -19,14 +16,7 @@ if [ -f $SCRIPT_DIR/org-anize-rc ]; then
 fi
 
 org-init-help(){
-    echo 'Usage: org-init-project <CMD> [<PROJECT/PATTERN>] [<SEARCHPATH>]
-  
-  find    Find and list available projects
-  init    Initialize new project with default directory structure at PROJECT
-  edit    Edit the master *.org file of PROJECT/PATTERN
-  open    Open PROJECT/PATTERN root folder
-
-'
+    echo 'Usage: org-init-project <PROJECT>'
 }
 
 # Opts/Args
