@@ -20,7 +20,11 @@ shift;
 ##----------------------------------------------------------------------------##
 # find
 org-find(){
-    ORGS=`find ${ORG_PATH//:/ } -iname "*"$PRO"*-project.org" -a ! -name ".*" | xargs -n1 readlink -f | sort | uniq`;
+    ORGS=$(
+        find ${ORG_PATH//:/ } -maxdepth 1 -iname "*"$PRO"*-project.org" -a ! -name ".*" |
+            xargs -n1 readlink -f |
+            sort | uniq
+        );
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
     
     if [ -n "$PROS" ]; then

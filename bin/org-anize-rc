@@ -1,5 +1,5 @@
 #!/bin/bash
-ORG_PATH="/home/thackl/projects/*/org:/home/thackl/projects/*/*/org"
+ORG_PATH="/home/thackl/projects/*/*:/home/thackl/projects/*/*/org"
 ORG_EDITOR=emacs
 ORG_FILEMANAGER=nautilus
 
