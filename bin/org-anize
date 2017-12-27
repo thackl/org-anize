@@ -15,7 +15,6 @@ CMD=${1:-"help"}
 PRO=$2;
 
 shift;
-shift;
 
 ##----------------------------------------------------------------------------##
 # find
@@ -107,7 +106,26 @@ org-dir(){
 ##----------------------------------------------------------------------------##
 # init
 org-init(){
-    org-init-project $@;
+    PRO_DATE=$(date +"%D")
+    mkdir -p $PRO;
+
+    for subdir in ${ORG_PRO_DIRS//:/ }; do
+        mkdir -p "$PRO/$subdir";
+    done
+
+    PRO_FILE=$PRO/$PRO$ORG_PRO_SUF; # create *-project.org at top-level
+    if [ ! -e $PRO_FILE ]; then
+        echo "$ORG_PRO_TPL" | while read -r line ; do
+            while [[ "$line" =~ (\$\{[a-zA-Z_][a-zA-Z_0-9]*\}) ]] ; do
+                LHS=${BASH_REMATCH[1]}
+                RHS="$(eval echo "\"$LHS\"")"
+                line=${line//$LHS/$RHS}
+            done
+            echo "$line" >> $PRO_FILE
+        done
+    fi;
+
+    echo "Created $PRO_FILE";
 }
 
 
@@ -115,7 +133,7 @@ org-init(){
 
 ##----------------------------------------------------------------------------##
 org-help(){
-    echo 'Usage: org-anize <CMD> [<PROJECT/PATTERN>] [<SEARCHPATH>]
+    echo 'Usage: org-anize <CMD> [<PROJECT/PATTERN>] [<SUPER>] [<TOPIC>]
 
   find    Find and list available projects
   init    Initialize new project with default directory structure at PROJECT

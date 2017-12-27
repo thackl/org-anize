@@ -2,17 +2,17 @@
 ORG_PATH="/home/thackl/projects/*/*:/home/thackl/projects/*/*/org"
 ORG_EDITOR=emacs
 ORG_FILEMANAGER=nautilus
+ORG_MAX_OPEN=1 # open at most this many files/dirs from a single match
 
-ORG_PRJ_SUF="-project.org"
-ORG_MAX_OPEN=1 # open at most this many files from a single hit
-ORG_PRJ_DIRS="org:docs:code:etc"
+ORG_PRO_SUF="-project.org"
+ORG_PRO_DIRS="" #"org:docs:code:etc"
 
-ORG_PRJ_AUTHOR="Thomas Hackl"
-ORG_PRJ_TPL=$(cat <<'EOF'
+ORG_PRO_AUTHOR="Thomas Hackl"
+ORG_PRO_TPL=$(cat <<'EOF'
 # -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
-#+TITLE: Project ${PRJ_ID}
-#+AUTHOR: ${ORG_PRJ_AUTHOR}
-#+DATE: ${PRJ_DATE}
+#+TITLE: Project ${PRO_ID}
+#+AUTHOR: ${ORG_PRO_AUTHOR}
+#+DATE: ${PRO_DATE}
 
 * Meta
 * Research Log
