@@ -4,6 +4,7 @@ ORG_EDITOR=emacs
 ORG_FILEMANAGER=nautilus
 
 ORG_PRJ_SUF="-project.org"
+ORG_MAX_OPEN=1 # open at most this many files from a single hit
 ORG_PRJ_DIRS="org:docs:code:etc"
 
 ORG_PRJ_AUTHOR="Thomas Hackl"

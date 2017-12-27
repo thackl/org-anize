@@ -14,7 +14,7 @@ fi
 CMD=${1:-"help"}
 PRO=$2;
 
-shift; 
+shift;
 shift;
 
 ##----------------------------------------------------------------------------##
@@ -30,7 +30,7 @@ org-find(){
 
     if [ -n "$PROS" ]; then
 	printf "%-30s %-15s %s\n" Project Super Path
-        printf '=%.0s' {1..80}; echo;
+        printf -- '=%.0s' {1..80}; echo;
         for ((i=0;i<${#PROS[@]};++i)); do
 	    printf "%-30s %-15s %s\n" $(basename ${PROS[i]}) ${SUPS[i]} ${PROS[i]};
 	done;
@@ -48,21 +48,16 @@ org-edit(){
 
     TARGET=$1; # by default, open *-project-org file
 
-    org-find;
+    org-find; echo "";
 
     if [ 0 -lt ${#PROS[@]} ]; then
-	if [ 3 -lt ${#PROS[@]} ]; then
-	    echo "Are you sure you want to open this many projects at once"
+	if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
+	    echo -e "Matching too many projects!" >&2;
 	else
 	    if [ -z $TARGET ]; then
-		echo "editing *-project.org" 
-		for org in $ORGS; do echo "   $org"; done;
-		$ORG_EDITOR $ORGS & 
-	    else
-		echo "editing directory $TARGET" 
-		for pro in $PROS; do echo "   $pro/$TARGET"; done;
-		$ORG_EDITOR $pro/$TARGET & 
-	    fi; 
+		for org in $ORGS; do echo "editing $org"; done;
+		$ORG_EDITOR $ORGS &
+	    fi;
 	fi;
     fi;
 }
@@ -75,16 +70,15 @@ org-edit(){
 org-open(){
 
     org-find;
-    
+
     if [ 0 -lt ${#PROS[@]} ]; then
-	if [ 3 -lt ${#PROS[@]} ]; then
-	    echo "Are you sure you want to open this many projects at once"
+	if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
+	    echo "Matching too many projects!" >&2
 	else
-	    echo "opening:"
 	    for pro in $PROS; do
-		echo "   $pro";
-		$ORG_FILEMANAGER "$pro";
-	    done;  
+                echo "opening: $pro"
+		$ORG_FILEMANAGER "$pro" &
+	    done;
 	fi;
     fi;
 }
@@ -95,14 +89,14 @@ org-open(){
 org-dir(){
 
     org-find;
-    
+
     if [ 0 -lt ${#PROS[@]} ]; then
 	if [ 1 -lt ${#PROS[@]} ]; then
 	    echo "Matching multiple projects" 1>&2; exit;
 	else
 	    for pro in $PROS; do
 		echo $pro;
-	    done;  
+	    done;
 	fi;
     fi;
 }
@@ -122,7 +116,7 @@ org-init(){
 ##----------------------------------------------------------------------------##
 org-help(){
     echo 'Usage: org-anize <CMD> [<PROJECT/PATTERN>] [<SEARCHPATH>]
-  
+
   find    Find and list available projects
   init    Initialize new project with default directory structure at PROJECT
   edit    Edit the master *.org file of PROJECT/PATTERN
