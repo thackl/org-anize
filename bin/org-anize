@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Author: Thomas Hackl - thackl@lim4.de
+# Version: v1.0.0
 
 # find script dir
 [ -h $0 ] && SCRIPT=$(readlink "$0") || SCRIPT="$0";
@@ -128,21 +129,67 @@ org-init(){
     echo "Created $PRO_FILE";
 }
 
-
-
+##----------------------------------------------------------------------------##
+# aliases - convenient for placing them in bashrc...
+org-alias(){
+    echo '## org-anize
+alias oi='org-anize init' # create new org-project
+alias ol='org-anize list' # find and list favorite projects
+alias oll='org-anize list -a' # find and list all available projects
+alias od='org-anize chdir' # find and list available projects
+alias ob='org-anize browse' # open projects root dir
+alias oe='org-anize edit' # edit projects org file'
+}
 
 ##----------------------------------------------------------------------------##
 org-help(){
-    echo 'Usage: org-anize <CMD> [<PROJECT/PATTERN>] [<SUPER>] [<TOPIC>]
+    echo 'Usage: org-anize <command> [options] [project/pattern]
 
-  find    Find and list available projects
-  init    Initialize new project with default directory structure at PROJECT
-  edit    Edit the master *.org file of PROJECT/PATTERN
-  open    Open PROJECT/PATTERN root folder
+  init    initialize new project with default directory structure at <project>
+  list    find and list available projects
+  chdir   change into <project-pattern> directory
+  edit    edit <project-pattern>-project.org file with default editor ['$ORG_EDITOR']
+  browse  open <project-pattern> directory in default file manager ['$ORG_FILEMANAGER']
+  alias   print suggested shell aliases
 
+   -a     work with all projects, default is to work only with favorites
+   -V     show script version
+   -h     show this help
 '
 }
 
 
 ##----------------------------------------------------------------------------##
+
+# Require args
+[ $# -eq 0 ] && { org-help && exit 0; }
+
+# Execute getopt
+ARGS=`getopt --name "SCRIPT" \
+    --options "ahV" \
+    -- "$@"`
+[ $? -ne 0 ] && exit 1; # Exit if bad args
+eval set -- "$ARGS" # A little magic
+
+# Now go through all the options
+while true; do
+    case "$1" in
+        # -c|--code-projects)
+        #     [ ! -n "$2" ] && (echo "$1: value required" 1>&2 && exit 1);
+        #     CODE=$2
+        #     shift 2;;
+        -a) OPT_ALL=1; shift;;
+	-h) org-help && exit 0;;
+        -V) grep -m1 'Version' "$0" | sed 's/.*Version.\s*//'; exit 0;;
+        --) shift; break;;
+        *) echo "$1: Unknown option" 1>&2 && exit 1;;
+  esac
+done
+
+CMD=${1:-"help"}
+PRO=$2;
+
+shift;
+shift;
+
 org-$CMD $@;
