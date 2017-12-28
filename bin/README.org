@@ -1,0 +1,52 @@
+* Usage
+
+#+BEGIN_SRC sh
+org-anize <command> [options] [project/pattern]
+
+  init    initialize new project with default directory structure at <project>
+  list    find and list available projects
+  chdir   change into <project-pattern> directory
+  edit    edit <project-pattern>-project.org file with default editor [emacs]
+  browse  open <project-pattern> directory in default file manager [nautilus]
+  alias   print suggested shell aliases
+
+   -a     work with all projects, default is to work only with favorites
+   -V     show script version
+   -h     show this help
+#+END_SRC
+
+* Aliases
+#+BEGIN_SRC sh
+org-anize alias
+## org-anize
+alias oi=org-anize init # create new org-project
+alias ol=org-anize list # find and list favorite projects
+alias oll=org-anize list -a # find and list all available projects
+alias od=org-anize chdir # find and list available projects
+alias ob=org-anize browse # open projects root dir
+alias oe=org-anize edit # edit projects org file
+
+org-anize alias >> ~/.bashrc
+#+END_SRC
+
+* Commands
+
+#+BEGIN_SRC sh
+ol
+# list in terminal
+Project                        Super           Path
+================================================================================
+cheat-sheets                   common          /home/thackl/projects/common/cheat-sheets
+emacs                          common          /home/thackl/projects/common/emacs
+it-and-software                common          /home/thackl/projects/common/it-and-software
+bar                            research        /home/thackl/projects/research/bar
+cross-scaffolding              research        /home/thackl/projects/research/cross-scaffolding
+metadata                       research        /home/thackl/projects/research/metadata
+pan-genomics                   research        /home/thackl/projects/research/pan-genomics
+
+oe pan
+# open pan-genomics-project.org in Emacs (or other Editor)
+
+ob cheat-sheets
+# open directory in Nautilus (or other File Manager)
+#+END_SRC
