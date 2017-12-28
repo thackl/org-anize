@@ -12,21 +12,26 @@ if [ -f $SCRIPT_DIR/org-anize-rc ]; then
     . $SCRIPT_DIR/org-anize-rc
 fi
 
-CMD=${1:-"help"}
-PRO=$2;
-
-shift;
 
 ##----------------------------------------------------------------------------##
-# find
+# find - sets up the PATH cache for all of the other functions
 org-find(){
+    ORG_PATH=$ORG_PATH_FAV && [ $OPT_ALL ] && ORG_PATH=$ORG_PATH_ALL
     ORGS=$(
         find ${ORG_PATH//:/ } -maxdepth 1 -iname "*"$PRO"*-project.org" -a ! -name ".*" |
-            xargs -n1 readlink -f |
+            xargs -n1 readlink -f 2>/dev/null |
             sort | uniq
         );
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
     SUPS=($(for pro in ${PROS[@]}; do sup=$(basename $(dirname $pro)); echo ${sup}; done;))
+    [ -z "$PROS" ] && { echo "No *-project.org file matching '"$PRO"' found" >&2; exit 1; }
+}
+
+##----------------------------------------------------------------------------##
+# list projects
+org-list(){
+
+    org-find;
 
     if [ -n "$PROS" ]; then
 	printf "%-30s %-15s %s\n" Project Super Path
@@ -35,20 +40,17 @@ org-find(){
 	    printf "%-30s %-15s %s\n" $(basename ${PROS[i]}) ${SUPS[i]} ${PROS[i]};
 	done;
     else
-	echo "No org file matching "$PRO" found" 1>&2
+	echo "No *-project.org file matching '"$PRO"' found" 1>&2
     fi;
 }
-
-
-
 
 ##----------------------------------------------------------------------------##
 # edit
 org-edit(){
 
-    TARGET=$1; # by default, open *-project-org file
+    org-find;
 
-    org-find; echo "";
+    TARGET=$1; # by default, open *-project-org file
 
     if [ 0 -lt ${#PROS[@]} ]; then
 	if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
@@ -62,12 +64,9 @@ org-edit(){
     fi;
 }
 
-
-
-
 ##----------------------------------------------------------------------------##
-# open
-org-open(){
+# browse
+org-browse(){
 
     org-find;
 
@@ -76,23 +75,22 @@ org-open(){
 	    echo "Matching too many projects!" >&2
 	else
 	    for pro in $PROS; do
-                echo "opening: $pro"
+                echo "opening $pro in $ORG_FILEMANAGER"
 		$ORG_FILEMANAGER "$pro" &
 	    done;
 	fi;
     fi;
 }
 
-
 ##----------------------------------------------------------------------------##
-# change-dir
+# return single project directory
 org-dir(){
 
     org-find;
 
     if [ 0 -lt ${#PROS[@]} ]; then
 	if [ 1 -lt ${#PROS[@]} ]; then
-	    echo "Matching multiple projects" 1>&2; exit;
+	    echo "Matching too many projects" 1>&2; exit;
 	else
 	    for pro in $PROS; do
 		echo $pro;
@@ -101,8 +99,9 @@ org-dir(){
     fi;
 }
 
-
-
+org-chdir(){
+    cd $(org-dir);
+}
 
 ##----------------------------------------------------------------------------##
 # init
