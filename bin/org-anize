@@ -99,10 +99,6 @@ org-dir(){
     fi;
 }
 
-org-chdir(){
-    cd $(org-dir);
-}
-
 ##----------------------------------------------------------------------------##
 # init
 org-init(){
@@ -131,13 +127,13 @@ org-init(){
 ##----------------------------------------------------------------------------##
 # aliases - convenient for placing them in bashrc...
 org-alias(){
-    echo '## org-anize
-alias oi='org-anize init' # create new org-project
-alias ol='org-anize list' # find and list favorite projects
-alias oll='org-anize list -a' # find and list all available projects
-alias od='org-anize chdir' # find and list available projects
-alias ob='org-anize browse' # open projects root dir
-alias oe='org-anize edit' # edit projects org file'
+    echo "## org-anize
+alias oi='org-anize init'     # create new org-project
+alias of='org-anize list'     # find and list favorite projects
+alias ol='org-anize list -a'  # find and list all projects
+alias ob='org-anize browse'   # open projects root dir
+alias oe='org-anize edit'     # edit projects org file
+od(){cd \$(org-anize dir \$1)}  # change to project dir (needs to be function)"
 }
 
 ##----------------------------------------------------------------------------##
