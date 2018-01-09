@@ -133,7 +133,7 @@ alias of='org-anize list'     # find and list favorite projects
 alias ol='org-anize list -a'  # find and list all projects
 alias ob='org-anize browse'   # open projects root dir
 alias oe='org-anize edit'     # edit projects org file
-od(){cd \$(org-anize dir \$1)}  # change to project dir (needs to be function)"
+od(){cd \$(org-anize dir \$@)}  # change to project dir (needs to be function)"
 }
 
 ##----------------------------------------------------------------------------##
