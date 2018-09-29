@@ -16,9 +16,12 @@ fi
 ##----------------------------------------------------------------------------##
 # find - sets up the PATH cache for all of the other functions
 org-find(){
-    ORG_PATH=$ORG_PATH_FAV && [ $OPT_ALL ] && ORG_PATH=$ORG_PATH_ALL
+    ORG_PATH="$ORG_PATH_FAV" && [ $OPT_ALL ] && ORG_PATH="$ORG_PATH $ORG_PATH_MORE"
+    ORG_PATH="${ORG_PATH//[:$'\n']/ }"
+    ORG_PATH=$(eval echo $ORG_PATH)
+    echo $ORG_PATH
     ORGS=$(
-        find ${ORG_PATH//:/ } -maxdepth 1 -iname "*"$PRO"*-project.org" -a ! -name ".*" |
+        find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*-project.org" -a ! -name ".*" |
             xargs -n1 readlink -f 2>/dev/null |
             sort | uniq
         );

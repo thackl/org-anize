@@ -1,6 +1,16 @@
 #!/bin/bash
-ORG_PATH_FAV="/home/thackl/projects/research/*/:/home/thackl/projects/research/*/org:/home/thackl/projects/common/*/:/home/thackl/projects/common/*/org"
-ORG_PATH_ALL="/home/thackl/projects/*/*:/home/thackl/projects/*/*/org"
+# favorite projects
+ORG_PATH_FAV=$(cat <<EOF
+~/Research/{projects,communicate}/
+~/Code/projects/
+EOF
+)
+# more projects only search with -a
+ORG_PATH_MORE=$(cat <<EOF
+~/Research/side/
+EOF
+)
+
 ORG_EDITOR=emacs
 ORG_FILEMANAGER=nautilus
 ORG_MAX_OPEN=1 # open at most this many files/dirs from a single match
@@ -18,4 +28,4 @@ ORG_PRO_TPL=$(cat <<'EOF'
 * Meta
 * Research Log
 EOF
-           )
+)
