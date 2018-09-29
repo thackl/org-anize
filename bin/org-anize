@@ -12,33 +12,17 @@ if [ -f $SCRIPT_DIR/org-anize-rc ]; then
     . $SCRIPT_DIR/org-anize-rc
 fi
 
-
 ##----------------------------------------------------------------------------##
-# find - sets up the PATH cache for all of the other functions
-org-find(){
-    ORG_PATH="$ORG_PATH_FAV" && [ $OPT_ALL ] && ORG_PATH="$ORG_PATH $ORG_PATH_MORE"
-    ORG_PATH="${ORG_PATH//[:$'\n']/ }"
-    ORG_PATH=$(eval echo $ORG_PATH)
-    ORG_LEVEL=project
-    ORGS=$(
-        find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*"$ORG_PRO_SUF -a ! -name ".*" |
-            xargs -n1 readlink -f 2>/dev/null |
-            sort | uniq
-        );
-    PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
-    check-pro-min;
+# a few helper functions
 
-    if [ -n "$WPK" ]; then
-        ORG_LEVEL=workpack
-        ORGS=$(find $PROS -maxdepth 2 -name "*"$WPK"*"$ORG_WPK_SUF -a ! -name ".*" | sort)
-        PROS=($(for dir in $ORGS; do dirname $dir; done;))
-        check-pro-min;
-    fi;
-
-}
+org-dir-path(){ dir=$(dirname $1); echo ${dir%/org}; }
+org-dir-name(){ echo $(basename $(org-dir-path $1)); }
+org-sup-path(){ dir=$(dirname $(org-dir-path $1)); echo ${dir%/project}; }
+org-sup-name(){ echo $(basename $(org-sup-path $1)); }
+org-dir-path-short(){ dir=$(org-dir-path $1); echo ${dir/$HOME\//'~'/}; }
 
 check-pro-max(){
-    if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
+    if [ $ORG_MAX_OPEN -lt ${#ORGS[@]} ]; then
         echo -e "Matching too many ${ORG_LEVEL}s!" >&2;
         exit 1;
     fi;
@@ -47,9 +31,34 @@ check-pro-max(){
 check-pro-min(){
     MATCH=$PRO
     [ $ORG_LEVEL == "workpack" ] && MATCH=$WPK
-    if [ -z "$PROS" ]; then
-        echo "No $ORG_LEVEL.org file matching '"$MATCH"' found" >&2;
+    if [ -z "$ORGS" ]; then
+        echo "No $ORG_LEVEL.org file found matching '"$MATCH"'" >&2;
         exit 1;
+    fi;
+}
+
+##----------------------------------------------------------------------------##
+# find - sets up the PATH cache for all of the other functions
+org-find(){
+    ORG_PATH="$ORG_PATH_FAV" && [ $OPT_ALL ] && ORG_PATH="$ORG_PATH $ORG_PATH_MORE"
+    ORG_PATH="${ORG_PATH//[:$'\n']/ }"
+    ORG_PATH=$(eval echo $ORG_PATH)
+    ORG_LEVEL=project
+    ORGS=($(
+        find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*"$ORG_PRO_SUF -a ! -name ".*" |
+            xargs -n1 readlink -f 2>/dev/null |
+            sort | uniq
+        ));
+    check-pro-min;
+
+    if [ -n "$WPK" ]; then
+        ORG_LEVEL=workpack
+        ORGS=($(for org in ${ORGS[@]}; do
+            find $(org-dir-path $org) -maxdepth 2 -name "*"$WPK"*"$ORG_WPK_SUF\
+                 -a ! -name ".*" | sort
+            done;
+            ));
+        check-pro-min;
     fi;
 }
 
@@ -66,17 +75,11 @@ org-list(){
     fi;
 
     printf -- '=%.0s' {1..80}; echo;
-    for ((i=0;i<${#PROS[@]};++i)); do
-        I=${PROS[i]}
-	printf "%-30s %-15s %s\n" $(name $I) $(sup-name $I) $(path $I);
+    for org in ${ORGS[@]}; do
+	printf "%-30s %-15s %s\n" \
+               $(org-dir-name $org) $(org-sup-name $org) $(org-dir-path-short $org);
     done;
 }
-
-name(){ echo $(basename $1); }
-sup-name(){ echo $(basename $(dirname $1)); }
-path(){ echo ${1/$HOME\//'~'/}; }
-
-
 
 ##----------------------------------------------------------------------------##
 # edit
@@ -85,11 +88,11 @@ org-edit(){
     org-find;
     check-pro-max;
 
-    for org in $ORGS; do
+    for org in ${ORGS[@]}; do
         echo $org
         echo -e "editing $ORG_LEVEL "$(sup-name $org);
     done;
-    $ORG_EDITOR $ORGS &
+    $ORG_EDITOR ${ORGS[@]} &
 }
 
 ##----------------------------------------------------------------------------##
@@ -99,9 +102,9 @@ org-browse(){
     org-find;
     check-pro-max;
 
-    for pro in $PROS; do
+    for org in ${ORGS[@]}; do
         echo "opening $pro in $ORG_FILEMANAGER"
-	$ORG_FILEMANAGER "$pro" &
+	$ORG_FILEMANAGER $(org-dir-path $org) &
     done;
 }
 
@@ -112,8 +115,8 @@ org-dir(){
     org-find;
     check-pro-max;
 
-    for pro in $PROS; do
-	echo $pro;
+    for org in ${ORGS[@]}; do
+	echo $(org-dir-path $org);
     done;
 }
 
@@ -175,8 +178,8 @@ org-init-workpack(){
 # check if current dir is project
 get-current-project(){
     ls *$ORG_PRO_SUF &>/dev/null || { echo "not inside a project"; exit 1; }
-    PROS=( *$ORG_PRO_SUF )
-    PRO=$(basename ${PROS[0]} $ORG_PRO_SUF)
+    ORGS=( *$ORG_PRO_SUF )
+    PRO=$(org-dir-name ${ORGS[0]})
 }
 
 ##----------------------------------------------------------------------------##
