@@ -29,3 +29,16 @@ ORG_PRO_TPL=$(cat <<'EOF'
 * Research Log
 EOF
 )
+
+ORG_WPK_SUF="-workpack.org"
+ORG_WPK_DIRS="" #"org:docs:code:etc"
+ORG_WPK_AUTHOR=$ORG_PRO_AUTHOR
+ORG_WPK_TPL=$(cat <<'EOF'
+# -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
+#+TITLE: Workpack ${WPK_ID} of project ${PRO_ID}
+#+AUTHOR: ${ORG_WPK_AUTHOR}
+#+DATE: ${WPK_DATE}
+
+* Research Log
+EOF
+)
