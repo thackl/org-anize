@@ -17,7 +17,7 @@ fi
 
 org-dir-path(){ dir=$(dirname $1); echo ${dir%/org}; }
 org-dir-name(){ echo $(basename $(org-dir-path $1)); }
-org-sup-path(){ dir=$(dirname $(org-dir-path $1)); echo ${dir%/project}; }
+org-sup-path(){ dir=$(dirname $(org-dir-path $1)); echo ${dir%/projects}; }
 org-sup-name(){ echo $(basename $(org-sup-path $1)); }
 org-dir-path-short(){ dir=$(org-dir-path $1); echo ${dir/$HOME\//'~'/}; }
 
