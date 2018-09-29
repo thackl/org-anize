@@ -90,7 +90,7 @@ org-edit(){
 
     for org in ${ORGS[@]}; do
         echo $org
-        echo -e "editing $ORG_LEVEL "$(sup-name $org);
+        echo -e "editing $ORG_LEVEL ["$(org-dir-name $org)"]";
     done;
     $ORG_EDITOR ${ORGS[@]} &
 }
