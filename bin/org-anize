@@ -148,7 +148,7 @@ org-init(){
 
 ##----------------------------------------------------------------------------##
 # init workpack
-org-init-workpack(){
+org-workpack(){
     WPK=$PRO
     [ -z "$WPK" ] && { echo 'workpack name required'; exit 1; }
     get-current-project
@@ -185,29 +185,40 @@ get-current-project(){
 ##----------------------------------------------------------------------------##
 # aliases - convenient for placing them in bashrc...
 org-alias(){
-    echo "## org-anize
-alias oi='org-anize init'     # create new org-project
-alias of='org-anize list'     # find and list favorite projects
-alias ol='org-anize list -a'  # find and list all projects
-alias ob='org-anize browse'   # open projects root dir
-alias oe='org-anize edit'     # edit projects org file
-od(){cd \$(org-anize dir \$@)}  # change to project dir (needs to be function)"
+    cat <<'EOF'
+## org-anize
+alias oi='org-anize init'          # create new org-project
+alias ow='org-anize workpack'      # create new workpack in project
+alias ol='org-anize list'          # find and list favorite projects
+alias oL='org-anize list -a'       # find and list all projects
+alias ob='org-anize browse'        # open project/workpack dir
+alias oB='org-anize browse -a'     # open project/workpack dirs (all)
+alias oe='org-anize edit'          # edit project/workpack org file
+alias oE='org-anize edit -a'       # edit project/workpack org file (all)
+od(){ cd $(org-anize dir $@); }    # change to project/workpack dir
+oD(){ cd $(org-anize dir -a $@); } # change to project/workpack dir
+ox(){ od $@; oe $@; }              # change dir and edit file
+oX(){ od -a $@; oe -a $@; }        # change dir and edit file"
+EOF
 }
+
 
 ##----------------------------------------------------------------------------##
 org-help(){
-    echo 'Usage: org-anize <command> [options] [project/pattern]
+    echo 'Usage: org-anize <command> [options] [project] [workpack]
+  partial project/workpack matches are supported in search commands
 
-  init    initialize new project with default directory structure at <project>
-  list    find and list available projects
-  chdir   change into <project-pattern> directory
-  edit    edit <project-pattern>-project.org file with default editor ['$ORG_EDITOR']
-  browse  open <project-pattern> directory in default file manager ['$ORG_FILEMANAGER']
-  alias   print suggested shell aliases
+  init      initialize new project with default directory structure
+  workpack  initialize new workpack within current project
+  list      find and list (matching) projects
+  chdir     change into <project [workpack]> matching directory
+  edit      edit <project [workpack]> .org file in ['$ORG_EDITOR']
+  browse    open <project [workpack]> directory in ['$ORG_FILEMANAGER']
+  alias     print suggested shell aliases
 
-   -a     work with all projects, default is to work only with favorites
-   -V     show script version
-   -h     show this help
+   -a       work with all projects, default is to work only with favorites
+   -V       show script version
+   -h       show this help
 '
 }
 
