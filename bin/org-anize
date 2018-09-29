@@ -19,15 +19,38 @@ org-find(){
     ORG_PATH="$ORG_PATH_FAV" && [ $OPT_ALL ] && ORG_PATH="$ORG_PATH $ORG_PATH_MORE"
     ORG_PATH="${ORG_PATH//[:$'\n']/ }"
     ORG_PATH=$(eval echo $ORG_PATH)
-    echo $ORG_PATH
+    ORG_LEVEL=project
     ORGS=$(
-        find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*-project.org" -a ! -name ".*" |
+        find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*"$ORG_PRO_SUF -a ! -name ".*" |
             xargs -n1 readlink -f 2>/dev/null |
             sort | uniq
         );
     PROS=($(for dir in $ORGS; do dir=$(dirname $dir); echo ${dir%/org}; done;))
-    SUPS=($(for pro in ${PROS[@]}; do sup=$(basename $(dirname $pro)); echo ${sup}; done;))
-    [ -z "$PROS" ] && { echo "No *-project.org file matching '"$PRO"' found" >&2; exit 1; }
+    check-pro-min;
+
+    if [ -n "$WPK" ]; then
+        ORG_LEVEL=workpack
+        ORGS=$(find $PROS -maxdepth 2 -name "*"$WPK"*"$ORG_WPK_SUF -a ! -name ".*" | sort)
+        PROS=($(for dir in $ORGS; do dirname $dir; done;))
+        check-pro-min;
+    fi;
+
+}
+
+check-pro-max(){
+    if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
+        echo -e "Matching too many ${ORG_LEVEL}s!" >&2;
+        exit 1;
+    fi;
+}
+
+check-pro-min(){
+    MATCH=$PRO
+    [ $ORG_LEVEL == "workpack" ] && MATCH=$WPK
+    if [ -z "$PROS" ]; then
+        echo "No $ORG_LEVEL.org file matching '"$MATCH"' found" >&2;
+        exit 1;
+    fi;
 }
 
 ##----------------------------------------------------------------------------##
@@ -36,35 +59,37 @@ org-list(){
 
     org-find;
 
-    if [ -n "$PROS" ]; then
-	printf "%-30s %-15s %s\n" Project Super Path
-        printf -- '=%.0s' {1..80}; echo;
-        for ((i=0;i<${#PROS[@]};++i)); do
-	    printf "%-30s %-15s %s\n" $(basename ${PROS[i]}) ${SUPS[i]} ${PROS[i]};
-	done;
+    if [ $ORG_LEVEL == workpack ]; then
+	printf "%-30s %-15s %s\n" Workpack Project Path
     else
-	echo "No *-project.org file matching '"$PRO"' found" 1>&2
+	printf "%-30s %-15s %s\n" Project Super Path
     fi;
+
+    printf -- '=%.0s' {1..80}; echo;
+    for ((i=0;i<${#PROS[@]};++i)); do
+        I=${PROS[i]}
+	printf "%-30s %-15s %s\n" $(name $I) $(sup-name $I) $(path $I);
+    done;
 }
+
+name(){ echo $(basename $1); }
+sup-name(){ echo $(basename $(dirname $1)); }
+path(){ echo ${1/$HOME\//'~'/}; }
+
+
 
 ##----------------------------------------------------------------------------##
 # edit
 org-edit(){
 
     org-find;
+    check-pro-max;
 
-    TARGET=$1; # by default, open *-project-org file
-
-    if [ 0 -lt ${#PROS[@]} ]; then
-	if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
-	    echo -e "Matching too many projects!" >&2;
-	else
-	    if [ -z $TARGET ]; then
-		for org in $ORGS; do echo "editing $org"; done;
-		$ORG_EDITOR $ORGS &
-	    fi;
-	fi;
-    fi;
+    for org in $ORGS; do
+        echo $org
+        echo -e "editing $ORG_LEVEL "$(sup-name $org);
+    done;
+    $ORG_EDITOR $ORGS &
 }
 
 ##----------------------------------------------------------------------------##
@@ -72,17 +97,12 @@ org-edit(){
 org-browse(){
 
     org-find;
+    check-pro-max;
 
-    if [ 0 -lt ${#PROS[@]} ]; then
-	if [ $ORG_MAX_OPEN -lt ${#PROS[@]} ]; then
-	    echo "Matching too many projects!" >&2
-	else
-	    for pro in $PROS; do
-                echo "opening $pro in $ORG_FILEMANAGER"
-		$ORG_FILEMANAGER "$pro" &
-	    done;
-	fi;
-    fi;
+    for pro in $PROS; do
+        echo "opening $pro in $ORG_FILEMANAGER"
+	$ORG_FILEMANAGER "$pro" &
+    done;
 }
 
 ##----------------------------------------------------------------------------##
@@ -90,16 +110,11 @@ org-browse(){
 org-dir(){
 
     org-find;
+    check-pro-max;
 
-    if [ 0 -lt ${#PROS[@]} ]; then
-	if [ 1 -lt ${#PROS[@]} ]; then
-	    echo "Matching too many projects" 1>&2; exit;
-	else
-	    for pro in $PROS; do
-		echo $pro;
-	    done;
-	fi;
-    fi;
+    for pro in $PROS; do
+	echo $pro;
+    done;
 }
 
 ##----------------------------------------------------------------------------##
@@ -130,10 +145,10 @@ org-init(){
 
 ##----------------------------------------------------------------------------##
 # init workpack
-org-workpack(){
+org-init-workpack(){
     WPK=$PRO
     [ -z "$WPK" ] && { echo 'workpack name required'; exit 1; }
-    get-project
+    get-current-project
 
     WPK_DATE=$(date +"%D")
     mkdir -p $WPK;
@@ -158,12 +173,11 @@ org-workpack(){
 }
 
 # check if current dir is project
-get-project(){
+get-current-project(){
     ls *$ORG_PRO_SUF &>/dev/null || { echo "not inside a project"; exit 1; }
     PROS=( *$ORG_PRO_SUF )
     PRO=$(basename ${PROS[0]} $ORG_PRO_SUF)
 }
-
 
 ##----------------------------------------------------------------------------##
 # aliases - convenient for placing them in bashrc...
@@ -224,7 +238,9 @@ done
 
 CMD=${1:-"help"}
 PRO=$2;
+WPK=$3;
 
+shift;
 shift;
 shift;
 
