@@ -198,7 +198,7 @@ alias oE='org-anize edit -a'       # edit project/workpack org file (all)
 od(){ cd $(org-anize dir $@); }    # change to project/workpack dir
 oD(){ cd $(org-anize dir -a $@); } # change to project/workpack dir
 ox(){ od $@; oe $@; }              # change dir and edit file
-oX(){ od -a $@; oe -a $@; }        # change dir and edit file"
+oX(){ od -a $@; oe -a $@; }        # change dir and edit file
 EOF
 }
 
