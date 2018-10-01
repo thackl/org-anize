@@ -2,7 +2,7 @@
 # favorite projects
 ORG_PATH_FAV=$(cat <<EOF
 ~/Research/{projects,communicate}/
-~/Code/projects/
+~/Code/{projects,it-and-software}/
 EOF
 )
 # more projects only search with -a
@@ -24,7 +24,7 @@ ORG_PRO_TPL=$(cat <<'EOF'
 #+TITLE: Project ${PRO}
 #+AUTHOR: ${ORG_PRO_AUTHOR}
 #+DATE: ${PRO_DATE}
-#+DECRIPTION: ${PRO_DESC}
+#+DESCRIPTION: ${PRO_DESC}
 
 EOF
 )
@@ -37,7 +37,7 @@ ORG_WPK_TPL=$(cat <<'EOF'
 #+TITLE: Workpack ${WPK} of project ${PRO}
 #+AUTHOR: ${ORG_WPK_AUTHOR}
 #+DATE: ${WPK_DATE}
-#+DECRIPTION: ${WPK_DESC}
+#+DESCRIPTION: ${WPK_DESC}
 
 EOF
 )
