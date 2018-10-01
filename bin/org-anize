@@ -217,7 +217,7 @@ EOF
 
 ##----------------------------------------------------------------------------##
 org-help(){
-    echo 'Usage: org-anize <command> [options] [project] [workpack]
+    echo 'Usage: org-anize <command> [-options] [project] [description/workpack]
   partial project/workpack matches are supported in search commands
 
   init      initialize new project with default directory structure
