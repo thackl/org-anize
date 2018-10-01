@@ -19,6 +19,7 @@ ORG_PRO_SUF="-project.org"
 ORG_PRO_DIRS="" #"org:docs:code:etc"
 
 ORG_PRO_AUTHOR="Thomas Hackl"
+ORG_DATE_TPL="%Y-%m-%d"
 ORG_PRO_TPL=$(cat <<'EOF'
 # -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
 #+TITLE: Project ${PRO}

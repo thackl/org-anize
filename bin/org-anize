@@ -146,7 +146,7 @@ org-init(){
     [ -z "$PRO" ] && { echo 'project name required'; exit 1; }
     PRO_DESC="$*"
     echo "$PRO_DESC";
-    PRO_DATE=$(date +"%F")
+    PRO_DATE=$(date +"$ORG_DATE_TPL")
     mkdir -p $PRO;
 
     for subdir in ${ORG_PRO_DIRS//:/ }; do
@@ -176,7 +176,7 @@ org-workpack(){
     get-current-project
 
     WPK_DESC="$*"
-    WPK_DATE=$(date +"%F")
+    WPK_DATE=$(date +"$ORG_DATE_TPL")
     mkdir -p $WPK;
 
     for subdir in ${ORG_WPK_DIRS//:/ }; do
