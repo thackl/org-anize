@@ -62,6 +62,15 @@ org-find(){
     fi;
 }
 
+##
+org-find-latest(){
+
+    org-find;
+
+    ORG_LATEST=$( ls -1t ${ORGS[@]} | head -n1 )
+    ORGS=($ORG_LATEST)
+}
+
 ##----------------------------------------------------------------------------##
 # list projects
 org-list(){
@@ -89,8 +98,7 @@ org-edit(){
     PRO=$1; shift;
     WPK=$1; shift;
 
-    org-find;
-    check-pro-max;
+    org-find-latest;
 
     for org in ${ORGS[@]}; do
         echo $org
@@ -105,8 +113,7 @@ org-browse(){
     PRO=$1; shift;
     WPK=$1; shift;
 
-    org-find;
-    check-pro-max;
+    org-find-latest;
 
     for org in ${ORGS[@]}; do
         echo "opening $pro in $ORG_FILEMANAGER"
@@ -116,12 +123,16 @@ org-browse(){
 
 ##----------------------------------------------------------------------------##
 # return single project directory
+# NOTE: actually changing the directory of the shell calling org-anize is not
+# possible, because that would require to change the directory of the parent
+# shell. The work-around is to provide a function that returns the target
+# directory, and have the user define an alias that calls `cd $(org dir)` in the
+# parent shell
 org-dir(){
     PRO=$1; shift;
     WPK=$1; shift;
 
-    org-find;
-    check-pro-max;
+    org-find-latest;
 
     for org in ${ORGS[@]}; do
 	echo $(org-dir-path $org);
@@ -223,7 +234,7 @@ org-help(){
   init      initialize new project with default directory structure
   workpack  initialize new workpack within current project
   list      find and list (matching) projects
-  chdir     change into <project [workpack]> matching directory
+  dir       get <project [workpack]> matching directory
   edit      edit <project [workpack]> .org file in ['$ORG_EDITOR']
   browse    open <project [workpack]> directory in ['$ORG_FILEMANAGER']
   alias     print suggested shell aliases
