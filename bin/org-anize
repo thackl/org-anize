@@ -190,7 +190,7 @@ org-workpack(){
 # check if current dir is project
 get-current-project(){
     ls *$ORG_PRO_SUF &>/dev/null || { echo "not inside a project"; exit 1; }
-    ORGS=( *$ORG_PRO_SUF )
+    ORGS=( $(pwd)/*$ORG_PRO_SUF )
     PRO=$(org-dir-name ${ORGS[0]})
 }
 
