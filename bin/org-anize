@@ -54,7 +54,7 @@ org-find(){
     if [ -n "$WPK" ]; then
         ORG_LEVEL=workpack
         ORGS=($(for org in ${ORGS[@]}; do
-            find $(org-dir-path $org) -maxdepth 2 -name "*"$WPK"*"$ORG_WPK_SUF\
+            find $(org-dir-path $org) -maxdepth 2 -iname "*"$WPK"*"$ORG_WPK_SUF\
                  -a ! -name ".*" | sort
             done;
             ));
