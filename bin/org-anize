@@ -133,6 +133,8 @@ org-dir(){
 org-init(){
     PRO=$1; shift;
     [ -z "$PRO" ] && { echo 'project name required'; exit 1; }
+    PRO_DESC="$*"
+    echo "$PRO_DESC";
     PRO_DATE=$(date +"%D")
     mkdir -p $PRO;
 
@@ -162,6 +164,7 @@ org-workpack(){
     [ -z "$WPK" ] && { echo 'workpack name required'; exit 1; }
     get-current-project
 
+    WPK_DESC="$*"
     WPK_DATE=$(date +"%D")
     mkdir -p $WPK;
 
@@ -261,6 +264,5 @@ done
 
 CMD=${1:-"help"}
 shift;
-
 
 org-$CMD "$@";

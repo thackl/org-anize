@@ -21,12 +21,11 @@ ORG_PRO_DIRS="" #"org:docs:code:etc"
 ORG_PRO_AUTHOR="Thomas Hackl"
 ORG_PRO_TPL=$(cat <<'EOF'
 # -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
-#+TITLE: Project ${PRO_ID}
+#+TITLE: Project ${PRO}
 #+AUTHOR: ${ORG_PRO_AUTHOR}
 #+DATE: ${PRO_DATE}
+#+DECRIPTION: ${PRO_DESC}
 
-* Meta
-* Research Log
 EOF
 )
 
@@ -35,10 +34,10 @@ ORG_WPK_DIRS="" #"org:docs:code:etc"
 ORG_WPK_AUTHOR=$ORG_PRO_AUTHOR
 ORG_WPK_TPL=$(cat <<'EOF'
 # -*- org-hierarchical-todo-statistics: nil; org-latex-with-hyperref: nil; org-export-allow-bind-keywords: t -*-
-#+TITLE: Workpack ${WPK_ID} of project ${PRO_ID}
+#+TITLE: Workpack ${WPK} of project ${PRO}
 #+AUTHOR: ${ORG_WPK_AUTHOR}
 #+DATE: ${WPK_DATE}
+#+DECRIPTION: ${WPK_DESC}
 
-* Research Log
 EOF
 )
