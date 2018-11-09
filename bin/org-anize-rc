@@ -1,7 +1,7 @@
 #!/bin/bash
 # favorite projects
 ORG_PATH_FAV=$(cat <<EOF
-~/Research/{projects,communicate}/
+~/Research/{Pro-complex,CroV-complex,communicate}/
 ~/Code/{projects,it-and-software}/
 EOF
 )
