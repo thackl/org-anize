@@ -40,10 +40,13 @@ check-pro-min(){
 ##----------------------------------------------------------------------------##
 # find - sets up the PATH cache for all of the other functions
 org-find(){
+    ORG_LEVEL=project
+
+    [ -e "$PRO" ] && { ORGS=($PRO); return; } # actual file name given
+
     ORG_PATH="$ORG_PATH_FAV" && [ $OPT_ALL ] && ORG_PATH="$ORG_PATH $ORG_PATH_MORE"
     ORG_PATH="${ORG_PATH//[:$'\n']/ }"
     ORG_PATH=$(eval echo $ORG_PATH)
-    ORG_LEVEL=project
     ORGS=($(
         find $ORG_PATH -maxdepth 3 -iname "*"$PRO"*"$ORG_PRO_SUF -a ! -name ".*" |
             xargs -n1 readlink -f 2>/dev/null |
