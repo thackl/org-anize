@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+# Created: 09 Nov 2018
+# Author: Thomas Hackl, thackl@lim4.de
+use warnings;
+use strict;
+use Getopt::Long  qw(:config no_ignore_case bundling);
+use Data::Dumper;
+use FindBin qw($RealBin);
+use File::Copy;
+
+GetOptions (
+    "out|o=s" => \(my $out),
+    "help|h!" => \(my $help),
+    "debug|D!" => \(my $debug),
+) or die("Error in command line arguments\n");
+
+if ($help || @ARGV != 1){
+    print "Usage: org-html.pl foo.org\n";
+    printf " %-19s  %s\n", "-o/--out", "write to this file [foo.html]";
+    printf " %-19s  %s\n", "-h/--help", "show this help";
+    printf " %-19s  %s\n", "-D/--debug", "show debug messages";
+    exit 0;
+}
+
+my $inc_dir = $RealBin.'/../inc/';
+my $org_file = $ARGV[0];
+my $htm_file = $out // $org_file =~ s/.org$/.html/r;
+my $htm_dir = $htm_file =~ s/.html$//r;
+
+print STDERR "converting $org_file to $htm_file, $htm_dir\n";
+
+open(HTI,"-|", "org-ruby $org_file") or die;
+open(HTO, '>', $htm_file) or die $!;
+select(HTO); $|=1; # redirect STDOUT to file, unbuffered
+
+# bundle css and js
+mkdir($htm_dir) or die $!;
+for (qw(github-markdown.css highlight.pack.js hljs-github.css jquery-3.3.1.min.js)){
+    copy("$inc_dir/$_", "$htm_dir/.") or die "$! $_";
+}
+
+my $head = join("\n",
+q(<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xht
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+    <title></title>
+    <meta name="author" content="Thomas Hackl" />),
+qq(<link rel="stylesheet" href="$htm_dir/github-markdown.css">
+    <link rel="stylesheet" href="$htm_dir/hljs-github.css">
+    <script src="$htm_dir/highlight.pack.js"></script>
+    <script src="$htm_dir/jquery-3.3.1.min.js"></script>
+    <script>),
+q($(document).ready(function() {
+      $('pre').each(function(i, block) {
+        hljs.highlightBlock(block);
+      });
+    });
+    </script>
+  </head>
+));
+
+my $body = "<body>\n<div class=markdown-body>\n";
+# body from org-ruby
+while (<HTI>) {
+    # add lang to class for highlight.js
+    s/<pre class="src" lang="(.*?)"/<pre class="src $1" lang="$1"/;
+    # bundle images
+    s/img src="([^"]+)/'img src="'.bundle_img($1)/ge;
+    $body.= $_;
+}
+$body.="</div>\n</body>\n</html>\n";
+close(HTI);
+
+
+print $head, $body;
+close(HTO);
+
+
+
+sub bundle_img{
+    my $img_path = shift;
+    my $new_path = $htm_dir.'/'.$img_path =~ s/\//!/gr;
+    print STDERR "bundling $img_path\n";
+    copy($img_path, $new_path) or die "Copy failed: $! $img_path $new_path";
+    return $new_path;
+}
