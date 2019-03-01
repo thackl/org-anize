@@ -83,6 +83,6 @@ sub bundle_img{
     my $img_path = shift;
     my $new_path = $htm_dir.'/'.$img_path =~ s/\//!/gr;
     print STDERR "bundling $img_path\n";
-    copy($img_path, $new_path) or die "Copy failed: $! $img_path $new_path";
+    copy($img_path, $new_path) or warn "Copy failed: $! $img_path $new_path";
     return $new_path;
 }
