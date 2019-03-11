@@ -10,6 +10,7 @@ use File::Copy;
 
 GetOptions (
     "out|o=s" => \(my $out),
+    "force|f!" => \(my $force),
     "help|h!" => \(my $help),
     "debug|D!" => \(my $debug),
 ) or die("Error in command line arguments\n");
@@ -26,6 +27,14 @@ my $inc_dir = $RealBin.'/../inc/';
 my $org_file = $ARGV[0];
 my $htm_file = $out // $org_file =~ s/.org$/.html/r;
 my $htm_dir = $htm_file =~ s/.html$//r;
+
+if (-e $htm_file || -e $htm_dir) {
+    if ($force){
+        qx(rm -r $htm_file $htm_dir);
+    }else {
+        die "Output file and/or folder exists, set '-f' to overwrite\n[$htm_file] and/or\n[$htm_dir]\n";
+    }
+}
 
 print STDERR "converting $org_file to $htm_file, $htm_dir\n";
 
