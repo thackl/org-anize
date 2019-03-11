@@ -7,6 +7,7 @@ use Getopt::Long  qw(:config no_ignore_case bundling);
 use Data::Dumper;
 use FindBin qw($RealBin);
 use File::Copy;
+use POSIX;
 
 GetOptions (
     "out|o=s" => \(my $out),
@@ -48,15 +49,21 @@ for (qw(github-markdown.css highlight.pack.js hljs-github.css jquery-3.3.1.min.j
     copy("$inc_dir/$_", "$htm_dir/.") or die "$! $_";
 }
 
+my $author = qx(grep -oPm1 "^#\\+AUTHOR: \\K.*" $org_file);
+chomp($author);
+my $date = strftime("%F", localtime);
+
+my $author_date = qq(<p style="float:right;font-size:80%;"><span style="text-align:right;">$author , $date</span></p>);
+
 my $head = join("\n",
 q(<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xht
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-    <title></title>
-    <meta name="author" content="Thomas Hackl" />),
-qq(<link rel="stylesheet" href="$htm_dir/github-markdown.css">
+    <title></title>),
+qq( <meta name="author" content="$author" />
+    <link rel="stylesheet" href="$htm_dir/github-markdown.css">
     <link rel="stylesheet" href="$htm_dir/hljs-github.css">
     <script src="$htm_dir/highlight.pack.js"></script>
     <script src="$htm_dir/jquery-3.3.1.min.js"></script>
@@ -73,6 +80,9 @@ q($(document).ready(function() {
 my $body = "<body>\n<div class=markdown-body>\n";
 # body from org-ruby
 while (<HTI>) {
+    if (/^<h1 class="title">/) {
+        $_.= "$author_date\n"
+    }
     # add lang to class for highlight.js
     s/<pre class="src" lang="(.*?)"/<pre class="src $1" lang="$1"/;
     # bundle images
