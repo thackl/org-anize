@@ -32,11 +32,18 @@ if (! -e $htacc_file){
         "\n",
         "AuthType Basic",
         'AuthName "Password Protected Area"',
-        "AuthUserFile ".(abs_path($htacc_file)),
+        "AuthUserFile ".(abs_path($htpwd_file)),
         "Require valid-user"), "\n";
     close HTA;
 }
 
 if (defined($user)) {
     qx(htpasswd -c $htpwd_file $user);
+}
+
+if (qx(hostname) =~ /^eofe/) {
+    if (my ($pre) = abs_path($dir) =~ /thackl\/public_html\/(.*)/) {
+        print "Shared folder should be accessible at:\n";
+        print "https://engaging-web.mit.edu/~thackl/$pre\n";
+    }
 }
