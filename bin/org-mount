@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# org-mount <group>
+org-mount(){
+    while IFS=$'\t' read -r group protocol source target comment; do
+        [[ $group == $1 ]] || continue;
+        echo mounting $source to $target
+        org-mount-$protocol $source $target
+    done < $SCRIPT_DIR/org-mount.cfg
+}
+
+# org-mount-ssh <source> <target>
+uid=$(id -u)
+gid=$(id -g)
+org-mount-ssh(){
+    (set -x;
+     sshfs -o idmap=user -o uid=$uid -o gid=$gid $1 $2
+     )
+}
+
+# org-mount-irods <config> <target>
+org-mount-irods(){
+  irodsfs -config $1 $2;
+}
+
+org-umount(){
+    while IFS=$'\t' read -r group protocol source target comment; do
+        [[ $group == $1 ]] || continue;
+        echo unmounting $source from $target
+        fusermount -u $target
+    done <  $SCRIPT_DIR/org-mount.cfg
+}
+
+org-fumount(){
+    pgrep sshfs | xargs -n1 kill -9;
+    while IFS=$'\t' read -r group protocol source target comment; do
+        [[ $group == $1 ]] || continue;
+        echo unmounting $source from $target
+        sudo umount -l $target
+    done <  $SCRIPT_DIR/org-mount.cfg
+}
+
+# ## mounts
+# mount-rug(){
+#   ssh_mount rug:/home/p290949 ~/mnt/rug/pg-home;
+#   ssh_mount rug:/data/p290949 ~/mnt/rug/pg-data;
+#   ssh_mount rug:/data/pg-hackl-group ~/mnt/rug/pg-hackllab;
+#   ssh_mount rug:/data/pg-haslingerlab ~/mnt/rug/pg-haslingerlab;
+#   irodsfs -config ~/.irods/irodsfs.yaml ~/mnt/rug/rdms;
+# }
+# umount-rug(){
+#   fusermount -u ~/mnt/rug/pg-home;
+#   fusermount -u ~/mnt/rug/pg-data;
+#   fusermount -u ~/mnt/rug/pg-hackllab;
+#   fusermount -u ~/mnt/rug/pg-haslingerlab;
+#   fusermount -u ~/mnt/rug/rdms;
+# }          
+# is-mounted-rug(){
+#   mount | grep '^peregrine:' > /dev/null
+# }
+# umount-rug-force(){
+#   pgrep sshfs | xargs -n1 kill -9;
+#   sudo umount -l ~/mnt/rug/pg-home;
+#   sudo umount -l ~/mnt/rug/pg-data;
+#   sudo umount -l ~/mnt/rug/pg-hackllab;
+#   sudo umount -l ~/mnt/rug/pg-haslingerlab;
+# }
+
+# mount-bmm(){
+#   sshfs -o idmap=user -o uid=$(id -u) -o gid=$(id -g) fsd:/home/thackl ~/mnt/bmm/thackl;
+#   sshfs -o idmap=user -o uid=$(id -u) -o gid=$(id -g) fsd:/nfs/bmm/crov ~/mnt/bmm/crov;
+# }
+# umount-bmm(){
+#   fusermount -u ~/mnt/bmm/thackl;
+#   fusermount -u ~/mnt/bmm/crov;
+# }          
+# is-mounted-bmm(){
+#   mount | grep '^yar:' > /dev/null
+# }
+# umount-bmm-force(){
+#   pgrep sshfs | xargs -n1 kill -9;
+#   sudo umount -l ~/mnt/bmm/thackl;
+#   sudo umount -l ~/mnt/bmm/crov;
+# }

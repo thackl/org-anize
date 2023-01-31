@@ -12,6 +12,11 @@ if [ -f $SCRIPT_DIR/org-anize-rc ]; then
     . $SCRIPT_DIR/org-anize-rc
 fi
 
+# mount stuff
+if [ -f $SCRIPT_DIR/org-mount ]; then
+    . $SCRIPT_DIR/org-mount
+fi
+
 ##----------------------------------------------------------------------------##
 # a few helper functions
 
@@ -223,6 +228,9 @@ alias ob='org-anize browse'        # open project/workpack dir
 alias oB='org-anize browse -a'     # open project/workpack dirs (all)
 alias oe='org-anize edit'          # edit project/workpack org file
 alias oE='org-anize edit -a'       # edit project/workpack org file (all)
+alias om='org-anize mount'         # mount predefined group of drives
+alias ou='org-anize umount'        # unmount predefined group of drives
+alias ouf='org-anize umount-force' # sudo unmount predefined group of drives
 od(){ cd $(org-anize dir $@); }    # change to project/workpack dir
 oD(){ cd $(org-anize dir -a $@); } # change to project/workpack dir
 ox(){ od $@; oe $@; }              # change dir and edit file
@@ -243,6 +251,11 @@ org-help(){
   edit      edit <project [workpack]> .org file in ['$ORG_EDITOR']
   browse    open <project [workpack]> directory in ['$ORG_FILEMANAGER']
   alias     print suggested shell aliases
+
+  mount     mount group of drives defined in org-mount.cfg
+  umount    unmount group of drives defined in org-mount.cfg
+  umount-force
+            sudo-unmount group of drives defined in org-mount.cfg
 
    -a       work with all projects, default is to work only with favorites
    -V       show script version
