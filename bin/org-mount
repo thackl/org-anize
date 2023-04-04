@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 # org-mount <group>
 org-mount(){
+    if [[ $# -eq 0 ]]; then
+        echo "configured mounts:"
+        cat $SCRIPT_DIR/org-mount.cfg
+        exit;
+    fi;
+    
     while IFS=$'\t' read -r group protocol source target comment; do
         [[ $group == $1 ]] || continue;
         echo mounting $source to $target
